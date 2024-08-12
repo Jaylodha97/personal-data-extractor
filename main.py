@@ -202,6 +202,7 @@ def format_github_with_gemini(github_data):
 
     return formatted_github_data
 
+
 def main():
     user_data = {
         "name": os.getenv('USER_NAME'),
@@ -256,16 +257,9 @@ def main():
     MONGO_URI=f"mongodb+srv://{user_name}:{password}@cluster0.5hufumz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
     client = MongoClient(MONGO_URI)
-    print(client)
     db = client[os.getenv('MONGO_DB_NAME')][os.getenv('MONGO_CL_NAME')]
-    print(type(db))
-
-    # Store embeddings in their respective collections
-    # db['basic_details'].insert_one({"key": "basic_details", "embedding": basic_details_embeddings})
-    # db['resume'].insert_one({"key": "resume", "embedding": resume_embeddings})
-    # db['linkedin'].insert_one({"key": "linkedin", "embedding": linkedin_embeddings})
-    # db['github'].insert_one({"key": "github", "embedding": github_embeddings})
-    collection_data= [{
+    
+    collection_data = [{
         "resume_data": json.dumps(final_data["resume"]),
         "embeddings": resume_embeddings
     },
@@ -278,7 +272,13 @@ def main():
         "embeddings": linkedin_embeddings
     }]
 
-    db.insert_many(collection_data)
+    try:
+
+      db.insert_many(collection_data)
+      print("Data inserted to collection")
+
+    except:
+        print("Unable to insert data")
 
     # Save the final data to final_data.json
     with open('final_data.json', 'w') as f:
